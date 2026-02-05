@@ -114,62 +114,45 @@ if (-not $Installed -and -not $IsAdmin) {
     exit 1
 }
 
-# if ($Installed -and $IsAdmin) {
-#     Write-LogHost 'Run this script as a standard user after installation.' Yellow
-#     Write-Host "Press any key to exit..."
+# ================================
+# Install MEGAcmd + WinFsp
+# ================================
+if (-not $InstalledExe) {
+    Write-LogHost 'MEGAcmd not found. Installing...' Yellow
 
-#     $timeout = 15
-#     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+    try {
+        $winfsp = Invoke-RestMethod 'https://api.github.com/repos/winfsp/winfsp/releases/latest' `
+            -Headers @{ 'User-Agent' = 'PowerShell' }
 
-#     while ($stopwatch.Elapsed.TotalSeconds -lt $timeout) {
-#         if ([Console]::KeyAvailable) {
-#             [Console]::ReadKey($true) | Out-Null
-#             break
-#         }
-#         Start-Sleep -Milliseconds 200
-#     }
-#     exit 1
-#}
+        $msi = $winfsp.assets |
+            Where-Object browser_download_url -match '\.msi$' |
+            Select-Object -First 1
 
-# # ================================
-# # Install MEGAcmd + WinFsp
-# # ================================
-# if (-not $InstalledExe) {
-#     Write-LogHost 'MEGAcmd not found. Installing...' Yellow
+        if (-not $msi) { throw 'WinFsp MSI not found.' }
 
-#     try {
-#         $winfsp = Invoke-RestMethod 'https://api.github.com/repos/winfsp/winfsp/releases/latest' `
-#             -Headers @{ 'User-Agent' = 'PowerShell' }
+        $msiPath = Join-Path $env:TEMP (Split-Path $msi.browser_download_url -Leaf)
+        Invoke-WebRequest $msi.browser_download_url -OutFile $msiPath
 
-#         $msi = $winfsp.assets |
-#             Where-Object browser_download_url -match '\.msi$' |
-#             Select-Object -First 1
+        Start-Process msiexec.exe `
+            -ArgumentList "/i `"$msiPath`" /qn /norestart" `
+            -Wait
 
-#         if (-not $msi) { throw 'WinFsp MSI not found.' }
+        $megaSetup = Join-Path $env:TEMP 'MEGAcmdSetup.exe'
+        Invoke-WebRequest 'https://mega.nz/MEGAcmdSetup.exe' -OutFile $megaSetup
 
-#         $msiPath = Join-Path $env:TEMP (Split-Path $msi.browser_download_url -Leaf)
-#         Invoke-WebRequest $msi.browser_download_url -OutFile $msiPath
+        Start-Process $megaSetup -ArgumentList '/S' -Wait
 
-#         Start-Process msiexec.exe `
-#             -ArgumentList "/i `"$msiPath`" /qn /norestart" `
-#             -Wait
+        $env:PATH =
+            [Environment]::GetEnvironmentVariable('PATH','Machine') + ';' +
+            [Environment]::GetEnvironmentVariable('PATH','User')
 
-#         $megaSetup = Join-Path $env:TEMP 'MEGAcmdSetup.exe'
-#         Invoke-WebRequest 'https://mega.nz/MEGAcmdSetup.exe' -OutFile $megaSetup
-
-#         Start-Process $megaSetup -ArgumentList '/S' -Wait
-
-#         $env:PATH =
-#             [Environment]::GetEnvironmentVariable('PATH','Machine') + ';' +
-#             [Environment]::GetEnvironmentVariable('PATH','User')
-
-#         Write-LogHost 'MEGAcmd installed successfully.' Green
-#     }
-#     catch {
-#         Write-LogHost "Installation failed: $_" Red
-#         throw
-#     }
-# }
+        Write-LogHost 'MEGAcmd installed successfully.' Green
+    }
+    catch {
+        Write-LogHost "Installation failed: $_" Red
+        throw
+    }
+}
 
 # ================================
 # Credential Handling
