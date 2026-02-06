@@ -16,8 +16,19 @@
 
 .NOTES
     URL: https://www.jamesvincent.co.uk
-    Created: 2026-02-05
-    Version: 1.1
+    Created: 2026-02-06
+    Version: 1.2
+
+.CHANGELOG
+    1.2 - 2026-02-06
+        Fixed a bug in which MEGAcmdServer.exe launched within the process keeping the script alive
+    
+    1.1 - 2026-02-05
+        Added additional checks and logging to catch failures.
+        Enhanced security around the credentials.
+
+    1.0 - 2026-02-02
+        First release
 #>
 
 # ================================
@@ -75,7 +86,7 @@ if (-not (Test-Path $MEGAcmdDir)) {
     New-Item -ItemType Directory -Path $MEGAcmdDir -Force | Out-Null
     Write-LogHost "Created directory: $MEGAcmdDir" Green
 } else {
-
+ # nada
 }
 
 $InstalledExe = Get-ChildItem `
@@ -89,10 +100,24 @@ $CredExists = Test-Path $CredFile
 
 if ($InstalledExe -and $CredExists) {
     $Installed = 1
-    Start-Process "$MEGAcmdDir\MEGAcmdServer.exe"
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = "$MEGAcmdDir\MEGAcmdServer.exe"
+    $psi.Arguments = "--silent"
+    $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+    $psi.CreateNoWindow = $true
+    $psi.UseShellExecute = $false
+
+    [System.Diagnostics.Process]::Start($psi)
 } elseif ($InstalledExe -and -not $CredExists) {
     $Installed = 1
-    Start-Process "$MEGAcmdDir\MEGAcmdServer.exe"
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = "$MEGAcmdDir\MEGAcmdServer.exe"
+    $psi.Arguments = "--silent"
+    $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+    $psi.CreateNoWindow = $true
+    $psi.UseShellExecute = $false
+
+    [System.Diagnostics.Process]::Start($psi)
 } else {
     $Installed = 0
 }
@@ -234,7 +259,7 @@ if (-not (Get-MegaLoginStatus)) {
 # ================================
 # Map MEGA Drive
 # ================================
-Start-Process "$MEGAcmdDir\MEGAcmdServer.exe" -PassThru
+#Start-Process "$MEGAcmdDir\MEGAcmdServer.exe" -PassThru
 & "$MEGAcmdDir\MEGAclient.exe" fuse-add $MegaRemote | Out-Null
 
 $driveInfo = & "$MEGAcmdDir\MEGAclient.exe" fuse-show MEGA 2>&1
