@@ -16,8 +16,8 @@
 
 .NOTES
     URL: https://www.jamesvincent.co.uk
-    Created: 2026-02-06
-    Version: 1.2
+    Created: 2026-02-20
+    Version: 1.3
 
 .CHANGELOG
     1.3 - 2026-02-20
@@ -293,4 +293,5 @@ Remove-Variable MegaCred -Force
 
 Write-LogHost 'Script completed successfully.' Green
 exit 0
+
 
