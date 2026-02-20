@@ -20,6 +20,9 @@
     Version: 1.2
 
 .CHANGELOG
+    1.3 - 2026-02-20
+        Added an initial check to ensure the log file exists, to avoid errors on first run
+
     1.2 - 2026-02-06
         Fixed a bug in which MEGAcmdServer.exe launched within the process keeping the script alive
     
@@ -69,6 +72,14 @@ function Write-LogHost {
 
     # Always write full timestamp to log file
     Write-Log $Message
+}
+
+# ================================
+# Create Log file if it does not exist
+# ================================
+
+if (!(Test-Path "$LogFile")) {
+    New-Item -ItemType File -Path "$LogFile" | Out-Null
 }
 
 # ================================
@@ -282,3 +293,4 @@ Remove-Variable MegaCred -Force
 
 Write-LogHost 'Script completed successfully.' Green
 exit 0
+
