@@ -440,45 +440,45 @@ blueprint:
           selector:
             action: {}
 
-notification_section:
-  name: Notifications (optional)
-  icon: mdi:bell
-  description: Here you can setup optional notifications. Enter a notify service to enable notifications.
-  collapsed: true
-  input:
+    notification_section:
+      name: Notifications (optional)
+      icon: mdi:bell
+      description: Here you can setup optional notifications. Enter a notify service to enable notifications.
+      collapsed: true
+      input:
 
-    notification_entity:
-      name: Notify service
-      description: >
-        Enter a notify service to send messages to (for example:
-        notify.mobile_app_my_phone, notify.telegram).
+        notification_entity:
+          name: Notify service
+          description: >
+            Enter a notify service to send messages to (for example:
+            notify.mobile_app_my_phone, notify.telegram).
 
-        Leave empty to disable notifications.
-      default: ""
-      selector:
-        text:
-          multiline: false
+            Leave empty to disable notifications.
+          default: ""
+          selector:
+            text:
+              multiline: false
 
-    notification_message_title:
-      name: Notification title
-      description: |
-        `Optional`
+        notification_message_title:
+          name: Notification title
+          description: |
+            `Optional`
 
-        Please select a title to be used on each notification message.
+            Please select a title to be used on each notification message.
 
-        You can type a custom text.
-      default: friendly_name
-      selector:
-        select:
-          custom_value: true
-          multiple: false
-          options:
-            - label: Automation's friendly name
-              value: friendly_name
-            - label: Automation's entity Id
-              value: entity_id
-            - label: Blank (no title)
-              value: blank
+            You can type a custom text.
+          default: friendly_name
+          selector:
+            select:
+              custom_value: true
+              multiple: false
+              options:
+                - label: Automation's friendly name
+                  value: friendly_name
+                - label: Automation's entity Id
+                  value: entity_id
+                - label: Blank (no title)
+                  value: blank
 
         notification_select_notifications:
           name: Select what to notify
@@ -724,8 +724,13 @@ variables:
   input_firmware_update_mode: !input firmware_update_mode
   input_general_update_mode: !input general_update_mode
   input_update_inclusion_mode: !input update_inclusion_mode
-  input_notification_entity: !input notification_entity
-  input_notification_select_notifications: !input notification_select_notifications
+  input_notification_entity_raw: !input notification_entity
+  input_notification_entity: >-
+    {% if input_notification_entity_raw is string %}
+      {{ input_notification_entity_raw }}
+    {% else %}
+      {{ input_notification_entity_raw | first | default('') }}
+    {% endif %}  input_notification_select_notifications: !input notification_select_notifications
   input_notification_message_title: !input notification_message_title
   core_update_entity: >
     {% for u in integration_entities('hassio') | select('search', '^update[.]')
@@ -1104,7 +1109,7 @@ action:
                     {%- endif -%}
               - if:
                   - condition: template
-                    value_template: '{{ input_notification_entity | length > 0 }}'
+                    value_template: "{{ input_notification_entity | default('') | string | length > 0 }}"
                     alias: Check if notification entity is configured
                 then:
                   - alias: Notify - Send message
