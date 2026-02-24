@@ -446,18 +446,16 @@ blueprint:
       description: Here you can setup optional notifications. Select a notify entity to enable notifications.
       collapsed: true
       input:
-        notification_entity:
-          name: Notify service
-          description: >
-            Select a notify service to send messages to.
+notification_entity:
+  name: Notify service
+  description: >
+    Enter a notify service to send messages to (e.g. notify.mobile_app_my_phone, notify.telegram).
 
-            This can be Telegram, mobile app, or any other notify service.
-
-            Leave empty to disable notifications.
-          default: ""
-          selector:
-            service:
-              domain: notify
+    Leave empty to disable notifications.
+  default: ""
+  selector:
+    text:
+      multiline: false
 
         notification_message_title:
           name: Notification title
