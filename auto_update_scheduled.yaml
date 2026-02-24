@@ -460,7 +460,7 @@ blueprint:
           selector:
             entity:
               multiple: false
-
+              notify_device: 5b2f061a5a73290861c10abac8294e7d
 
         notification_message_title:
           name: Notification title
