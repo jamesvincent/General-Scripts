@@ -447,20 +447,17 @@ blueprint:
       collapsed: true
       input:
         notification_entity:
-          name: Notify entity
+          name: Notify service
           description: >
-            Select a notify entity to send messages to.
+            Select a notify service to send messages to.
 
-            This can be a Telegram notify entity, mobile app, or any other notify entity.
-
-            Note: For Telegram entities, special characters will be automatically escaped.
+            This can be Telegram, mobile app, or any other notify service.
 
             Leave empty to disable notifications.
-          default: []
+          default: ""
           selector:
-            entity:
-              multiple: false
-              notify_device: 5b2f061a5a73290861c10abac8294e7d
+            service:
+              domain: notify
 
         notification_message_title:
           name: Notification title
