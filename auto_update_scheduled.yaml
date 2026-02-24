@@ -440,44 +440,45 @@ blueprint:
           selector:
             action: {}
 
-    notification_section:
-      name: Notifications (optional)
-      icon: mdi:bell
-      description: Here you can setup optional notifications. Select a notify entity to enable notifications.
-      collapsed: true
-      input:
-notification_entity:
-  name: Notify service
-  description: >
-    Enter a notify service to send messages to (e.g. notify.mobile_app_my_phone, notify.telegram).
+notification_section:
+  name: Notifications (optional)
+  icon: mdi:bell
+  description: Here you can setup optional notifications. Enter a notify service to enable notifications.
+  collapsed: true
+  input:
 
-    Leave empty to disable notifications.
-  default: ""
-  selector:
-    text:
-      multiline: false
+    notification_entity:
+      name: Notify service
+      description: >
+        Enter a notify service to send messages to (for example:
+        notify.mobile_app_my_phone, notify.telegram).
 
-        notification_message_title:
-          name: Notification title
-          description: |
-            `Optional`
+        Leave empty to disable notifications.
+      default: ""
+      selector:
+        text:
+          multiline: false
 
-            Please select a title to be used on each notification message.
+    notification_message_title:
+      name: Notification title
+      description: |
+        `Optional`
 
-            You can type a custom text.
-          default:
-            - friendly_name
-          selector:
-            select:
-              custom_value: true
-              multiple: false
-              options:
-                - label: Automation's friendly name
-                  value: friendly_name
-                - label: Automation's entity Id
-                  value: entity_id
-                - label: Blank (no title)
-                  value: blank
+        Please select a title to be used on each notification message.
+
+        You can type a custom text.
+      default: friendly_name
+      selector:
+        select:
+          custom_value: true
+          multiple: false
+          options:
+            - label: Automation's friendly name
+              value: friendly_name
+            - label: Automation's entity Id
+              value: entity_id
+            - label: Blank (no title)
+              value: blank
 
         notification_select_notifications:
           name: Select what to notify
